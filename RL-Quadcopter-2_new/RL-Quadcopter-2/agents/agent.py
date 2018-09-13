@@ -144,15 +144,11 @@ class Actor:
         net = layers.Dense(units=32, activation='relu')(states)
         net = layers.BatchNormalization()(net)#增加batch和dropout
         net = layers.Dropout(0.5)(net)
+
         net = layers.Dense(units=64, activation='relu')(net)
         net = layers.BatchNormalization()(net)
         net = layers.Dropout(0.5)(net)
-        net = layers.Dense(units=128, activation='relu')(net)
-        net = layers.BatchNormalization()(net)
-        net = layers.Dropout(0.5)(net)
-        net = layers.Dense(units=64, activation='relu')(net)
-        net = layers.BatchNormalization()(net)
-        net = layers.Dropout(0.5)(net)
+
         net = layers.Dense(units=32, activation='relu')(net)
         net = layers.BatchNormalization()(net)
         net = layers.Dropout(0.5)(net)
@@ -177,7 +173,7 @@ class Actor:
         # Incorporate any additional losses here (e.g. from regularizers)
 
         # Define optimizer and training function
-        optimizer = optimizers.Adam(0.005)#0.001-0.005都会发生转子不动情况
+        optimizer = optimizers.Adam(0.0001)
         updates_op = optimizer.get_updates(params=self.model.trainable_weights, loss=loss)
         self.train_fn = K.function(
             inputs=[self.model.input, action_gradients, K.learning_phase()],
@@ -247,7 +243,6 @@ class Critic:
         net_actions = layers.Dense(units=64, activation='relu')(net_actions)
         net_actions = layers.BatchNormalization()(net_actions)
         net_actions = layers.Dropout(0.5)(net_actions)
-
         net_actions = layers.Dense(units=32, activation='relu')(net_actions)
         net_actions = layers.BatchNormalization()(net_actions)
         net_actions = layers.Dropout(0.5)(net_actions)
@@ -257,7 +252,6 @@ class Critic:
         net = layers.Add()([net_states, net_actions])
         net = layers.Activation('relu')(net)
 
-        # Add more layers to the combined network if needed
 
         # Add final output layer to prduce action values (Q values)
         Q_values = layers.Dense(units=1, name='q_values')(net)
@@ -266,7 +260,7 @@ class Critic:
         self.model = models.Model(inputs=[states, actions], outputs=Q_values)
 
         # Define optimizer and compile model for training with built-in loss function
-        optimizer = optimizers.Adam(0.001)#0.0001
+        optimizer = optimizers.Adam(0.001)#0.0001#0.00005
         self.model.compile(optimizer=optimizer, loss='mse')
 
         # Compute action gradients (derivative of Q values w.r.t. to actions)

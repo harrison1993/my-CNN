@@ -29,45 +29,28 @@ class Task():
     def get_reward(self):
         """Uses current pose of sim to return reward."""
         
-        
-        
-#        rewardvxy = -abs(self.sim.v[0]+self.sim.v[1]) #对左右速度惩罚
-#        rewardtz = -0.1*(abs(self.sim.pose[2]-self.target_pos[2]))#对不在目标高度位置惩罚
-#        rewardxy = -(abs(self.sim.pose[:2] - self.target_pos[:2])).sum()#对不在目标位置x，y惩罚
-#        rewardang= -(abs(self.sim.angular_v[:3])).sum()*0.1
-#        rewardvz = self.sim.v[2]*2     #给向上速度奖励。
-        
-#        all_reward = rewardvz+rewardvxy+rewardtz+rewardxy+rewardang
-#        rewardvxy = -abs(self.sim.v[0]+self.sim.v[1])
-#        rewardvz = self.sim.v[2]
-#        rewardxy = -(abs(self.sim.pose[:2] - self.target_pos[:2])).sum()#对不在目标位置x，y惩罚
-        
-
-        """Uses current pose of sim to return reward."""
        
-        # Reward positive velocity along z-axis
+        #给向上速度奖励
         
-        reward_vz = self.sim.v[2]#-self.sim.v[1]*0.2-self.sim.v[0]*0.2
-        
-        
-        # Reward positions close to target along z-axis
-        
-        reward_z = -(abs(self.sim.pose[2] - self.target_pos[2]))*1.2
+        reward_vzxy = self.sim.v[2]*1.3-self.sim.v[1]*0.2-self.sim.v[0]*0.2
         
         
-        # Reward positions close to target in xy-plane
-        reward_x = -(abs(self.sim.pose[0] - self.target_pos[0]))*1.2#*0.8
+        #对不在目标位置z惩罚
         
-        reward_y = -(abs(self.sim.pose[1] - self.target_pos[1]))*1.2#*0.8
+        reward_z = -(abs(self.sim.pose[2] - self.target_pos[2]))#无*1.3
         
         
-        # Reward ang change smoothly
-        #reward_ang= -(abs(self.sim.angular_v[:3])).sum()*0.2 
-        reward_ang= -(abs(self.sim.angular_v[:3])).sum()#*0.8
+        #对不在目标位置x，y惩罚
+        reward_x = -(abs(self.sim.pose[0] - self.target_pos[0]))*0.8
         
-        # Reward additional -1 to punish for each step, to reach target fast
-        return reward_vz+reward_z+reward_x+reward_y+reward_ang-1.0
-
+        reward_y = -(abs(self.sim.pose[1] - self.target_pos[1]))*0.8
+       
+        # 让变化角度变得平滑
+        
+        reward_ang= -(abs(self.sim.angular_v[:3])).sum()*0.8
+        
+        #return reward_vzxy+reward_z+reward_x+reward_y+reward_ang-1.0
+        return reward_vzxy+reward_z+reward_ang
 
         
 
